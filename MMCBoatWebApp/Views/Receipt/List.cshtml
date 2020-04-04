@@ -1,0 +1,561 @@
+﻿@model MMCBoatWebApp.Models.Pagination.PaginationModel
+
+@{
+    ViewData["Title"] = "List of receipts";
+}
+<div class="app-theme-white">
+    <div class="col-md-12">
+        <div class="app-main__inner">
+            <div class="app-page-title">
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon">
+                            <img alt="" src="~/images/logo.png" />
+                        </div>
+                        <div class="titleText">
+                            List of receipts
+                            <div class="page-title-subheading">Manage receipts</div>
+                        </div>
+                    </div>
+                    <div class="page-title-actions">
+                        <label>Welcome: @ViewBag.User (@ViewBag.UserType) </label> <button onclick="myFunction()"><i class="fa fa-angle-down" aria-hidden="true"></i></button> | @Html.ActionLink("Log Out", "Logout", "Login")
+
+                        <div id="myDIV" style="display:none">
+                            @Html.ActionLink("List of receipts", "List", "Receipt")
+                            @Html.ActionLink("List of users", "List", "UserMMC")
+                            @if (@ViewBag.UserType == "Administrator")
+                            {
+                                @Html.ActionLink("Create user", "CreateUser", "UserMMC")
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <form asp-action="List">
+            <div class="form-group">
+                <table>
+                    <tr>
+                        <td style="padding-right:5px;font-weight:bold;width:100px">
+                            From Date:
+                        </td>
+                        <td style="padding-right:5px;">
+                            <input type="text" id="FromDate" class="form-control">
+                        </td>
+                        <td style="padding-right:5px;font-weight:bold;width:72px">
+                            To Date:
+                        </td>
+                        <td style="padding-right:5px">
+                            <input type="text" id="ToDate" class="form-control">
+                        </td>
+
+                        <td style="padding-right:5px;font-weight:bold">
+                            Status:
+                        </td>
+                        <td style="padding-right:15px;width:21%">
+                            @Html.DropDownList("StatusName", new SelectList(ViewBag.ListOfStatus, "StatusName", "StatusName"), "All", new { @id = "ddlStatus", @class = "form-control" })
+                        </td>
+
+                        <td style="padding-right:5px;font-weight:bold">
+                            Company:
+                        </td>
+                        <td style="padding-right:15px;width:21%">
+                            @Html.DropDownList("CompanyName", new SelectList(ViewBag.ListOfCompany, "Name", "Name"), "All", new { @id = "ddlCompany", @class = "form-control" })
+                        </td>
+
+                        <td>
+                            <input style="width:auto" type="button" value="Search" class="edit-save-btn" onclick="GetList();" />
+                        </td>
+                        <td>
+                            <input style="width:auto" type="button" value="Clear filter" class="edit-save-btn" onclick="GetAllList();" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+
+        <div class="card">
+            <table id="example" class="table table-striped" style="width:100%"></table>
+        </div>
+    </div>
+</div>
+
+@if (ViewBag.Message != null)
+{
+    <script type="text/javascript">
+            window.onload = function () {
+                swal("", "@ViewBag.Message", "success")
+        };
+    </script>
+}
+
+<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.2/moment.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.10.12/sorting/datetime-moment.js"></script>
+
+<script>
+
+    var editor;
+    function myFunction() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+
+
+    $(document).ready(function () {
+        $.noConflict();
+        GetAllList();
+    });
+
+    function GetAllList() {
+        ClearAllControls();
+        $.get('http://mmcbot4.azurewebsites.net/api/MMCReceipt/GetAllReceipt', function (data) {
+
+            $.fn.dataTable.moment("DD/MM/YYYY HH:mm a");
+
+            $('#example').empty();
+            $('#example').DataTable({
+
+                destroy: true,
+                data: data,
+                "ordering": false,
+                columns: [
+                    {
+                        "title": "Receipt Date",
+                        "data": "billDate",
+                        "type": "date ",
+
+                        "render": function (data) {
+                            var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+                                navigator.language ||   // All browsers
+                                navigator.userLanguage; // IE <= 10
+                            var date = new Date(data).toLocaleDateString(language.toString());
+                            return date
+                        }
+                    },
+                    { "title": "Id", data: "transactionNo", "className": "align-center", "width": "7%" },
+                    { "title": "Invoice No.", data: "billNumber", "className": "align-center" },
+                    {
+                        "title": "Vendor Detail", data: null,
+                        "width": "20%",
+                        render: function (data, type, row) {
+                            if (row.vendorAddress == null || row.phoneNumber == null) {
+                                row.vendorAddress = 'NA'
+                                row.phoneNumber = 'NA'
+                                return '<html><body><b style="color:#34495E ">Compnay:  </b>' + row.companyName + '<br/>' + '<b style="color:#34495E">Name: </b>' + row.vendorName + '<br/>' + '<b style="color:#34495E">Address: </b>' + row.vendorAddress + '<br/>' + '<b style="color:#34495E">Phone: </b>' + row.phoneNumber + '</body><html>'
+
+                            }
+                            else {
+                                return '<html><body><b style="color:#34495E">Compnay:  </b>' + row.companyName + '<br/>' + '<b style="color:#34495E">Name: </b>' + row.vendorName + '<br/>' + '<b style="color:#34495E">Address: </b>' + row.vendorAddress + '<br/>' + '<b style="color:#34495E">Phone: </b>' + row.phoneNumber + '</body><html>'
+                            }
+                        }
+                    },
+                    { "title": "Description", "width": "20%", data: "description", "className": "align-center" },
+
+                    {
+                        "title": "Status",
+                        data: "status",
+                        "width": "10%",
+                        "className": "align-center",
+                        render: function (data) {
+
+                            var color = 'black';
+                            if (data == 'Pending for MMC Review') {
+                                color = '#f27835';
+                            }
+                            if (data == 'Ready to Publish') {
+                                color = ' #0c84da';
+                            }
+                            return '<span style="color:' + color + '">' + data + '</span>';
+                        }
+                    },
+                    {
+
+                        "title": "Tax Amount", data: "taxAmount", "className": "align-right", "width": "5%",
+                        render: function (data, type, row) {
+                            var dd = row.taxAmount;
+                            var sym = row.currencySymbol;
+                            if (sym == null) {
+                                return parseFloat(dd).toFixed(2);
+                            } else {
+                                return sym + ' ' + parseFloat(dd).toFixed(2);
+                            }
+
+                        }
+                    },
+                    {
+                        "title": "Total Amount", data: "totalAmount", "className": "align-right", "width": "5%",
+                        render: function (data, type, row) {
+                            var dd = row.totalAmount;
+                            var sym = row.currencySymbol;
+                            if (sym == null) {
+                                return parseFloat(dd).toFixed(2);
+                            } else {
+                                return sym + ' ' + parseFloat(dd).toFixed(2);
+                            }
+                        }
+                    },
+                    {
+                        "title": "Upload Date-Time Stamp",
+                        data: "createdDate",
+                        type: 'datetime',
+                        "width": "10%",
+                        render: function (d) {
+
+                            if (d == null) {
+                                return '';
+                            }
+                            else {
+
+                                var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+                                    navigator.language ||   // All browsers
+                                    navigator.userLanguage; // IE <= 10
+
+                                var date = new Date(d).toLocaleDateString(language.toString());
+
+                                var textTime = new Date(d)
+                                    .toLocaleTimeString(language.toString(), { hour: 'numeric', minute: 'numeric' });
+
+                                return date + ' ' + textTime
+                            }
+                        }
+                    },
+                    {
+                        "title": "Processed Date-Time Stamp",
+                        data: "modifiedDate",
+                        type: 'datetime',
+                        "width": "10%",
+                        render: function (d) {
+
+                            if (d == null) {
+                                return '';
+                            }
+                            else {
+                                var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+                                    navigator.language ||   // All browsers
+                                    navigator.userLanguage; // IE <= 10
+
+                                var date = new Date(d).toLocaleDateString(language.toString());
+
+                                var textTime = new Date(d)
+                                    .toLocaleTimeString(language.toString(), { hour: 'numeric', minute: 'numeric' });
+
+                                return date + ' ' + textTime
+                            }
+                        }
+                    },
+                    { "title": "Uploaded By", data: "uploadedBy", "className": "align-center" },
+                    {
+                        "title": "Action",
+                        data: "status",
+                        "width": "20%",
+                        "className": "align-center",
+                        render: function (data, type, row) {
+
+                            if (data == 'Pending for MMC Review') {
+                                return '<button id="' + row.id + '" class="editButton btn btn-primary active btn-md"><i class="fa fa-edit"></i> Edit</button> <button id="' + row.id + '" class="deleteButton btn btn-danger btn-md active"><i class="fa fa-trash"></i> Delete</button>'
+                            }
+                            if (data == 'Ready to Publish') {
+
+                                return ' <button style="cursor:not-allowed" class="btn btn-secondary active btn-md" disabled><i class="fa fa-edit"></i> Edit</button> <button id="' + row.id + '" class=" deleteButton btn btn-danger btn-md active"><i class="fa fa-trash"></i> Delete</button>';
+                            }
+
+                        },
+                    },
+                ],
+
+            });
+        })
+    }
+
+    function ClearAllControls() {
+
+        var date = new Date();
+
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+
+        if (month < 10) month = "0" + month;
+        if (day < 10) day = "0" + day;
+
+        var today = month + "/" + day + "/" + year;
+        document.getElementById('FromDate').value = today
+        document.getElementById('ToDate').value = today
+
+        document.getElementById('ddlStatus').value = '';
+
+        document.getElementById('ddlCompany').value = '';
+    }
+
+    $('#example').on('click', 'button.editButton', function () {
+        var Id = $(this).attr('id');
+        window.location = "/Receipt/Edit/" + Id;
+    });
+
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
+
+<script type="text/javascript">
+    $('#example').on('click', 'button.deleteButton', function (e) {
+        var Id = $(this).attr('id');
+
+        swal({
+            title: "Are you sure?",
+            text: "You will not be able to recover this receipt!",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: '#DD6B55',
+            confirmButtonText: 'Yes, I am sure!',
+            cancelButtonText: "No, cancel it!",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+            function (isConfirm) {
+
+                if (isConfirm) {
+                    swal({
+                        title: "Why delete?",
+                        text: "Please enter a valid reason for delete",
+                        type: "input",
+                        showCancelButton: true,
+                        closeOnConfirm: false,
+                        inputPlaceholder: "Write reason here"
+                    }, function (inputValue) {
+                        if (inputValue === false) return false;
+                        if (inputValue === "") {
+                            swal.showInputError("You need to write something!");
+                            return false
+                        }
+                        $.ajax({
+                            url: 'http://mmcbot4.azurewebsites.net/api/PushNotifications/sendNotification?id=' + Id + "&reason=" + inputValue,
+                            method: 'POST',
+                            success: function (result) {
+                                $.ajax({
+                                    url: 'http://mmcbot4.azurewebsites.net/api/User/DeleteReceiptById?Id=' + Id,
+                                    method: 'POST',
+                                    success: function (result) {
+                                        swal("Deleted!", "Receipt deleted successfully!", "success");
+                                        GetAllList();
+                                    }
+                                });
+                            }
+                        });
+                    });
+
+                } else {
+                    swal("Cancelled", "You have cancelled the delete operation", "error");
+                    e.preventDefault();
+                }
+            });
+    });
+</script>
+
+<script>
+    function GetList() {
+
+        console.log('on get list')
+        $.get('http://mmcbot4.azurewebsites.net/api/Blob/SearchReceiptData?statusName=' + $("#ddlStatus").val() + "&companyName=" + $("#ddlCompany").val() + "&frmDate=" + $("#FromDate").val() + "&toDate=" + $('#ToDate').val(), function (data) {
+
+            $.fn.dataTable.moment("DD/MM/YYYY HH:mm a");
+
+            $('#example').empty();
+            $('#example').DataTable({
+
+                destroy: true,
+                data: data,
+                "ordering": false,
+                columns: [
+                    {
+                        "title": "Receipt Date",
+                        "data": "billDate",
+                        "type": "date ",
+
+                        "render": function (data) {
+                            var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+                                navigator.language ||   // All browsers
+                                navigator.userLanguage; // IE <= 10
+                            var date = new Date(data).toLocaleDateString(language.toString());
+                            return date
+                        }
+                    },
+                    { "title": "Id", data: "transactionNo", "className": "align-center", "width": "7%" },
+                    { "title": "Invoice No.", data: "billNumber", "className": "align-center" },
+                    {
+                        "title": "Vendor Detail", data: null,
+                        "width": "20%",
+                        render: function (data, type, row) {
+                            if (row.vendorAddress == null || row.phoneNumber == null) {
+                                row.vendorAddress = 'NA'
+                                row.phoneNumber = 'NA'
+                                return '<html><body><b style="color:#34495E ">Compnay:  </b>' + row.companyName + '<br/>' + '<b style="color:#34495E">Name: </b>' + row.vendorName + '<br/>' + '<b style="color:#34495E">Address: </b>' + row.vendorAddress + '<br/>' + '<b style="color:#34495E">Phone: </b>' + row.phoneNumber + '</body><html>'
+
+                            }
+                            else {
+                                return '<html><body><b style="color:#34495E">Compnay:  </b>' + row.companyName + '<br/>' + '<b style="color:#34495E">Name: </b>' + row.vendorName + '<br/>' + '<b style="color:#34495E">Address: </b>' + row.vendorAddress + '<br/>' + '<b style="color:#34495E">Phone: </b>' + row.phoneNumber + '</body><html>'
+                            }
+                        }
+                    },
+                    { "title": "Description", "width": "20%", data: "description", "className": "align-center" },
+                    {
+                        "title": "Status",
+                        data: "status",
+                        "width": "10%",
+                        "className": "align-center",
+                        render: function (data) {
+
+                            var color = 'black';
+                            if (data == 'Pending for MMC Review') {
+                                color = '#f27835';
+                            }
+                            if (data == 'Ready to Publish') {
+                                color = ' #0c84da';
+                            }
+                            return '<span style="color:' + color + '">' + data + '</span>';
+                        }
+                    },
+                    {
+                        "title": "Tax Amount", data: "taxAmount", "className": "align-right", "width": "5%",
+                        render: function (data, type, row) {
+                            var dd = row.taxAmount;
+                            var sym = row.currencySymbol;
+                            if (sym == null) {
+                                return Number.parseFloat(dd).toFixed(2);
+                            } else {
+                                return sym + ' ' + Number.parseFloat(dd).toFixed(2);
+                            }
+
+                        }
+                    },
+                    {
+                        "title": "Total Amount", data: "totalAmount", "className": "align-right", "width": "5%",
+                        render: function (data, type, row) {
+                            var dd = row.totalAmount;
+                            var sym = row.currencySymbol;
+                            if (sym == null) {
+                                return Number.parseFloat(dd).toFixed(2);
+                            } else {
+                                return sym + ' ' + Number.parseFloat(dd).toFixed(2);
+                            }
+                        }
+                    },
+                    {
+                        "title": "Upload Date-Time Stamp",
+                        data: "createdDate",
+                        type: 'datetime',
+                        "width": "10%",
+                        render: function (d) {
+                            if (d == null) {
+                                return '';
+                            }
+                            else {
+
+                                var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+                                    navigator.language ||   // All browsers
+                                    navigator.userLanguage; // IE <= 10
+
+                                var date = new Date(d).toLocaleDateString(language.toString());
+
+                                var textTime = new Date(d)
+                                    .toLocaleTimeString(language.toString(), { hour: 'numeric', minute: 'numeric' });
+
+                                return date + ' ' + textTime
+                            }
+                        }
+                    },
+                    {
+                        "title": "Processed Date-Time Stamp",
+                        data: "modifiedDate",
+                        type: 'datetime',
+                        "width": "10%",
+                        render: function (d) {
+
+                            if (d == null) {
+                                return '';
+                            }
+                            else {
+                                var language = navigator.languages && navigator.languages[0] || // Chrome / Firefox
+                                    navigator.language ||   // All browsers
+                                    navigator.userLanguage; // IE <= 10
+
+                                var date = new Date(d).toLocaleDateString(language.toString());
+
+                                var textTime = new Date(d)
+                                    .toLocaleTimeString(language.toString(), { hour: 'numeric', minute: 'numeric' });
+
+                                return date + ' ' + textTime
+                            }
+                        }
+                    },
+                    { "title": "Uploaded By", data: "uploadedBy", "className": "align-center" },
+                    {
+                        "title": "Action",
+                        data: "status",
+                        "width": "20%",
+                        "className": "align-center",
+                        render: function (data, type, row) {
+                            if (data == 'Pending for MMC Review') {
+                                return '<button id="' + row.id + '" class="editButton btn btn-primary active btn-md"><i class="fa fa-edit"></i> Edit</button> <button id="' + row.id + '" class="deleteButton btn btn-danger btn-md active"><i class="fa fa-trash"></i> Delete</button>'
+                            }
+                            if (data == 'Ready to Publish') {
+
+                                return ' <button style="cursor:not-allowed" class="btn btn-secondary active btn-md" disabled><i class="fa fa-edit"></i> Edit</button> <button id="' + row.id + '" class=" deleteButton btn btn-danger btn-md active"><i class="fa fa-trash"></i> Delete</button>';
+                            }
+                        },
+                    },
+                ],
+
+            });
+        })
+    }
+</script>
+
+<script>
+
+    $(function () {
+        var date = new Date();
+
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+
+        if (month < 10) month = "0" + month;
+        if (day < 10) day = "0" + day;
+
+        var today = month + "/" + day + "/" + year;
+
+        $("#FromDate").datepicker();
+        $("#ToDate").datepicker();
+
+        document.getElementById('FromDate').value = today
+        document.getElementById('ToDate').value = today
+    });
+</script>
+
+<style type="text/css">
+    .align-right {
+        text-align: right;
+        max-width: 80px
+    }
+
+    .align-left {
+        text-align: left;
+        max-width: 80px
+    }
+
+    .align-center {
+        text-align: center;
+        max-width: 80px
+    }
+</style>
+
+

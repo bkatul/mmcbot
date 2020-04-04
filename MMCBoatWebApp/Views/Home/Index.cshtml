@@ -1,0 +1,18 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+<div class="row">
+    <div class="col-md-auto">
+
+        @if (Model != null)
+        {
+            <p><b>Access Token </b>: @Model.AccessToken</p>
+            <p><b>Token Type</b> : @Model.TokenType</p>
+            <p><b>Refresh Token</b> : @Model.RefreshToken</p>
+        }
+    </div>
+</div>

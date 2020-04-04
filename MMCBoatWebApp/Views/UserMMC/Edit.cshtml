@@ -1,0 +1,151 @@
+﻿@model MMCBoatWebApp.Models.ReceiptModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<div class="app-theme-white">
+    <div class="col-md-12">
+        <div class="app-main__inner">
+            <div class="app-page-title">
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon">
+                            <img alt="" src="~/images/logo.png" />
+                        </div>
+                        <div class="titleText">
+                            Edit Receipt
+                           @* <div class="page-title-subheading"> Lorem Ipsum is simply dummy text of the printing and typesetting industry. </div>*@
+                            <div class="page-title-subheading"> Edit </div>
+                        </div>
+                    </div>
+                    <div class="page-title-actions">
+                        <label>Welcome: @ViewBag.User</label> |  @Html.ActionLink("Log Out", "Login", "Login")
+                        @*<button class="btn-shadow  btn btn-success" type="button">Log Out </button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="editWrapper">
+            <div class="row">
+                <div class="col imgWrapper">
+                    <div>
+                        <img style="width:100%" id="myImg" src="@Url.Content(@ViewBag.Url)" />
+                    </div>
+                </div>
+                <!-- The Modal -->
+                <div id="myModal" class="modal">
+                    <span class="close">&times;</span>
+                    <img class="modal-content" id="img01">
+                    <div id="caption"></div>
+                </div>
+
+                <div class="col">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group" hidden>
+                            <label asp-for="id" class="control-label"></label>
+                            <input asp-for="id" class="form-control" />
+                            <span asp-validation-for="id" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="billDate" class="control-label"></label>
+                            <input asp-for="billDate"  class="form-control" />
+                            <span asp-validation-for="billDate" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="billNumber" class="control-label"></label>
+                            <input asp-for="billNumber" class="form-control" />
+                            <span asp-validation-for="billNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="vendorName" class="control-label"></label>
+                            <input asp-for="vendorName" class="form-control" />
+                            <span asp-validation-for="vendorName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="vendorAddress" class="control-label"></label>
+                            <input asp-for="vendorAddress" class="form-control" />
+                            <span asp-validation-for="vendorAddress" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="phoneNumber" class="control-label"></label>
+                            <input asp-for="phoneNumber" class="form-control" />
+                            <span asp-validation-for="phoneNumber" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="description" class="control-label"></label>
+                            <input asp-for="description" class="form-control" />
+                            <span asp-validation-for="description" class="text-danger"></span>
+                        </div>
+                        @*<div class="form-group">
+                    <label asp-for="quantity" class="control-label"></label>
+                    <input asp-for="quantity" class="form-control" />
+                    <span asp-validation-for="quantity" class="text-danger"></span>
+                </div>*@
+                        @*<div class="form-group">
+                    <label asp-for="unitPrice" class="control-label"></label>
+                    <input asp-for="unitPrice" class="form-control" />
+                    <span asp-validation-for="unitPrice" class="text-danger"></span>
+                </div>*@
+                        @*<div class="form-group">
+                    <label asp-for="accountCode" class="control-label"></label>
+                    <input asp-for="accountCode" class="form-control" />
+                    <span asp-validation-for="accountCode" class="text-danger"></span>
+                </div>*@
+                        <div class="form-group">
+                            <label asp-for="taxAmount" class="control-label"></label>
+                            <input asp-for="taxAmount" class="form-control" />
+                            <span asp-validation-for="taxAmount" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="totalAmount" class="control-label"></label>
+                            <input asp-for="totalAmount" class="form-control" />
+                            <span asp-validation-for="totalAmount" class="text-danger"></span>
+                        </div>
+                        @*<div class="form-group">
+                    <label asp-for="assignTo" class="control-label"></label>
+                    <select asp-for="assignTo" class="form-control"
+                            asp-items="@(new SelectList(@ViewBag.ListUser,"assignTo","assignTo"))"></select>
+                    <span asp-validation-for="assignTo" class="text-danger"></span>
+                </div>*@
+                        <div class="form-group">
+                            <input type="submit" value="Save" class="edit-save-btn" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById("myModal");
+
+    // Get the image and insert it inside the modal - use its "alt" text as a caption
+    var img = document.getElementById("myImg");
+    var modalImg = document.getElementById("img01");
+    var captionText = document.getElementById("caption");
+    img.onclick = function () {
+        modal.style.display = "block";
+        $('body').toggleClass('vdfc');
+        modalImg.src = this.src;
+        captionText.innerHTML = this.alt;
+    }
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        modal.style.display = "none";
+        $('body').toggleClass('vdfc');
+    }
+</script>
+
+
+
+

@@ -1,0 +1,119 @@
+﻿@model MMCBoatWebApp.Models.UserMMCModel
+@{
+    ViewData["Title"] = "Create user";
+}
+
+<div class="app-theme-white">
+    <div class="col-md-12">
+        <div class="app-main__inner">
+            <div class="app-page-title">
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon">
+                            <img alt="" src="~/images/logo.png" />
+                        </div>
+                        <div class="titleText">
+                            Create user
+                            <div class="page-title-subheading">Add new users for MMC Bot web application</div>
+                        </div>
+                    </div>
+                    <div class="page-title-actions">
+                        <label>Welcome: @ViewBag.User (@ViewBag.UserType) </label> <button onclick="myFunction()"><i class="fa fa-angle-down" aria-hidden="true"></i></button> | @Html.ActionLink("Log Out", "Logout", "Login")
+                        <div id="myDIV" style="display:none">
+                            @Html.ActionLink("List of receipts", "List", "Receipt")
+                            @Html.ActionLink("List of users", "List", "UserMMC")
+                            @Html.ActionLink("Create user", "CreateUser", "UserMMC")
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="limiter">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center">
+                <div class="wrap-login100 wrap-login100CU">
+                    <div class="login100-pic js-tilt picCU" data-tilt>
+                        <img src="/images/user.png" alt="User">
+                    </div>
+                    <form asp-action="CreateUser" class="login100-form validate-form">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <span class="login100-form-title" style="padding-bottom:20px;">
+                            Create User
+                        </span>
+                        <div class="form-group" hidden>
+                            <label asp-for="id" class="control-label"></label>
+                            <input asp-for="id" class="form-control" />
+                            <span asp-validation-for="id" class="text-danger"></span>
+                        </div>
+                        <div class="wrap-input100 validate-input flexDiv">
+                            <div data-validate="First Name is required">
+                                @*<label asp-for="firstName" class="control-label"></label>*@
+                                <input asp-for="firstName" class="input100" type="text" placeholder="First Name" />
+                                @*<span asp-validation-for="firstName" class="text-danger"></span>*@
+                                <span class="symbol-input100">
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                            <div data-validate="Last Name is required">
+                                @*<label asp-for="lastName" class="control-label"></label>*@
+                                <input asp-for="lastName" class="input100" type="text" placeholder="Last Name" />
+                                @*<span asp-validation-for="lastName" class="text-danger"></span>*@
+                                <span class="symbol-input100">
+                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="wrap-input100 validate-input flexDiv">
+                            <div data-validate="Valid email address is required: ex@abc.xyz">
+                                @*<label asp-for="emailAddress" class="control-label"></label>*@
+                                <input asp-for="emailAddress" class="input100" type="text" placeholder="Email Address" />
+                                @*<span asp-validation-for="emailAddress" class="text-danger"></span>*@
+                                <span class="symbol-input100">
+                                    <i class="fa fa-envelope" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                            <div data-validate="Password is required">
+                                @*<label asp-for="password" class="control-label"></label>*@
+                                <input asp-for="password" class="input100" placeholder="Password" type="password" />
+                                @*<span asp-validation-for="password" class="text-danger"></span>*@
+                                <span class="symbol-input100">
+                                    <i class="fa fa-lock" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="wrap-input100 validate-input flexDiv">
+                            <div>
+                                @*<label asp-for="countryId" class="control-label"></label>*@
+                                <select asp-for="countryId" class="input100"
+                                        asp-items="@(new SelectList(@ViewBag.ListOfCountry,"CountryID", "CountryName"))"></select>
+                            </div>
+                            <div>
+                                @*<label asp-for="roleId" class="control-label"></label>*@
+                                <select class="input100" asp-for="roleId"
+                                        asp-items="@(new SelectList(@ViewBag.ListOfRoles,"Id", "Name"))"></select>
+                            </div>
+                        </div>
+                        <div class="wrap-input100 validate-input flexDiv saveCU">
+                            <div data-tilt>
+                                <input type="submit" value="Create" class="login100-form-btn" />
+                            </div>
+                            
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function myFunction() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>

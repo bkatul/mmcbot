@@ -1,0 +1,139 @@
+﻿@model MMCBoatWebApp.Models.Pagination.PaginationModel
+
+@{
+    ViewData["Title"] = "List of users";
+}
+<div class="app-theme-white">
+    <div class="col-md-12">
+        <div class="app-main__inner">
+            <div class="app-page-title">
+                <div class="page-title-wrapper">
+                    <div class="page-title-heading">
+                        <div class="page-title-icon">
+                            <img alt="" src="~/images/logo.png" />
+                        </div>
+                        <div class="titleText">
+                            List of users
+                            <div class="page-title-subheading">View MMC Bot users</div>
+                        </div>
+                    </div>
+                    <div class="page-title-actions">
+                        <label>Welcome: @ViewBag.User (@ViewBag.UserType) </label> <button onclick="myFunction()"><i class="fa fa-angle-down" aria-hidden="true"></i></button> | @Html.ActionLink("Log Out", "Logout", "Login")
+                        <div id="myDIV" style="display:none">
+                            @Html.ActionLink("List of receipts", "List", "Receipt")
+                            @Html.ActionLink("List of users", "List", "UserMMC")
+                            @if (@ViewBag.UserType == "Administrator")
+                            {
+                                @Html.ActionLink("Create user", "CreateUser", "UserMMC")
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        @*<div class="form-group">
+                @Html.ActionLink("Create User", "CreateUser", "UserMMC")  |  @Html.ActionLink("Back to receipt list", "List", "Receipt")
+            </div>*@
+        <div class="card">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th hidden>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].id)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].role)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].firstName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].lastName)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].emailAddress)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].country)
+                        </th>
+                        <th>
+                            @Html.DisplayNameFor(model => model.userMMCData[0].isActive)
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.userMMCData)
+                    {
+                        <tr style="font-size:12px">
+                            <td hidden>
+                                @Html.DisplayFor(modelItem => item.id)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.role)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.firstName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.lastName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.emailAddress)
+                            </td>
+
+                            <td>
+                                @Html.DisplayFor(modelItem => item.country)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.isActive)
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="listPagination">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pg-blue">
+
+                @*@if (ViewBag.Page > 0)
+                    {*@
+                <li class="page-item @(Model.CurrentPage - 1==0 ? "disabled" : "")">
+                    <a asp-page="/pagination" asp-route-currentpage="@(Model.CurrentPage - 1)" class="page-link">Previous</a>
+                </li>
+                @*}*@
+                @for (var i = 1; i <= Model.TotalPages / 10 + 1; i++)
+                {
+
+                    <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                        <a asp-page="/pagination" asp-route-currentpage="@i" class="page-link">@i</a>
+                    </li>
+
+                }
+                @*@if (ViewBag.Page <= ViewBag.MaxPage)
+                    {*@
+                <li class="page-item @(Model.CurrentPage>= Model.TotalPages / 10+1 ? "disabled" : "")">
+                    <a asp-page="/pagination" asp-route-currentpage="@(Model.CurrentPage + 1)" class="page-link">
+                        Next
+                    </a>
+                </li>
+                @*}*@
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<script>
+    function myFunction() {
+        var x = document.getElementById("myDIV");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+        }
+    }
+</script>
