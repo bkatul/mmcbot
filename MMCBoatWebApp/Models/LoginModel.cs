@@ -23,6 +23,7 @@ namespace MMCBoatWebApp.Models
         public string Password { get; set; }
         public string Role { get; set; }
         public int CompanyId { get; set; }
+         public int CompanyId2gti { get; set; }
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
