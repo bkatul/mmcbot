@@ -43,7 +43,7 @@ steps:
   inputs:
     command: publish
     publishWebProjects: false
-    projects: 'srmmcbot/MMCApi/MMCApi.csproj'
+    projects: 'mmcbot/MMCApi/MMCApi.csproj'
     arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: true
 
